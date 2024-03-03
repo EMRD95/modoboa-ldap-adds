@@ -47,7 +47,7 @@ pip install python-ldap django-auth-ldap
 Uncomment the ldap line in:
 
 ```bash
-sudo nano /srv/modoboa/instance/settings.py
+sudo nano /srv/modoboa/instance/instance/settings.py
 ```
 
 ![image](https://github.com/EMRD95/modoboa-ldap-adds/assets/114953576/2d4d139b-6417-4d13-86dc-8759c786a0c3)
