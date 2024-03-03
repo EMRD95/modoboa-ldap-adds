@@ -1,5 +1,5 @@
 # modoboa-ldap-adds
-### Local installation of modoboa with LDAP integration, Windows Server 2022 + Ubuntu 22.04 LTS Server.
+### Tutorial for a local installation of modoboa with LDAP integration, Windows Server 2022 + Ubuntu 22.04 LTS Server.
 
 (home server, for an email server that can send emails to the internet, don't use a domestic IP address) 
 
@@ -14,7 +14,7 @@ cd modoboa-installer
 sudo ./run.py your.domain
 ```
 
-Create a A record in your DNS server that points your mail server to the domain it's associated to.
+Create a A record in your DNS server that points your email server to the domain it's associated to.
 
 Add a domain in modoboa, gather the DNS rules necessary and set them up in your DNS server.
 
