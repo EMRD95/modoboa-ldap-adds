@@ -57,12 +57,12 @@ Add the MODOBOA_APPS ldapsync
 
 ![image](https://github.com/EMRD95/modoboa-ldap-adds/assets/114953576/224840ca-6f27-4ce2-ab33-3bd1921bbb6b)
 
-### Set up Dovecot
+### Set up Dovecot [Optional, manual LDAP configuration for other specific use, won't work with other accounts that logged into modoboa webmail, mail folder will be erased the first time the user connect to the modoboa webui]
 
 Keep your current configuration during installation
 
 ```bash
-sudo apt-get install dovecot-ldap dovecot-core dovecot-lmtpd
+sudo apt-get install dovecot-ldap
 ```
 
 Configure Dovecot LDAP:
@@ -86,7 +86,7 @@ user_filter     = (&(userPrincipalName=%u)(objectClass=person)(!(userAccountCont
 pass_filter     = (&(userPrincipalName=%u)(objectClass=person)(!(userAccountControl=514)))
 pass_attrs      = userPassword=password
 default_pass_scheme = CRYPT
-user_attrs      = =home=/var/vmail/vmail1/%Ld/%Ln/Maildir/,=mail=maildir:/var/vmail/vmail1/%Ld/%Ln/Maildir/
+user_attrs = =home=/srv/vmail/%Ld/%Ln,=mail=maildir:/srv/vmail/%Ld/%Ln
 ```
 
 Configure LDAP in Dovecot's auth system:
@@ -115,6 +115,13 @@ Uncomment !include auth-ldap.conf.ext
 sudo nano +124 /etc/dovecot/conf.d/10-auth.conf
 ```
 
+Set up the UID and GID
+```bash
+sudo nano /etc/dovecot/conf.d/10-master.conf
+```
+![image](https://github.com/EMRD95/modoboa-ldap-adds/assets/114953576/b5f15324-bc0e-47ed-8652-21fa2b200323)
+
+
 Verify LMTP service configuration in Dovecot, ensure the `service lmtp` section is correctly configured.
 
 ```bash
@@ -131,7 +138,6 @@ service lmtp {
 }
 ```
 
-The vmail user should already be created.
 
 ### Modoboa LDAP and Dovecot Synchronization
 
@@ -174,7 +180,7 @@ Enable export to LDAP ? No
 
 Enable import from LDAP ? Yes
 
-Enable Dovecot LDAP sync ? Yes
+Enable Dovecot LDAP sync ? No
 
 
 Restart
@@ -183,3 +189,43 @@ sudo systemctl restart dovecot
 ```
 
 Make sure to replace placeholders like `your.domain`, `192.168.10.xx`, and `PASSWORD` with your actual data.
+
+ACME domain setup with cloudflare API
+```bash
+sudo su
+#https://github.com/acmesh-official/acme.sh/wiki/sudo
+ 
+optional, for server edition
+# apt-get install socat
+ 
+curl https://get.acme.sh | sh -s email=mail@mail.com
+
+source  ~/.bashrc
+ 
+acme.sh --help
+ 
+acme.sh --set-default-ca --server letsencrypt
+
+export CF_Token="TOKEN DNS ZONE"
+export CF_Email="mail@mail.com"
+
+acme.sh --issue --dns dns_cf -d domain.com
+ 
+Auto import
+
+acme.sh --install-cert -d domain.com \
+--key-file /etc/ssl/private/domain.com.key \
+--fullchain-file /etc/ssl/certs/domain.com.cert \
+--reloadcmd "service nginx force-reload"
+
+```
+Uncomment the sll line and restart dovecot
+```bash
+sudo nano /etc/dovecot/conf.d/10-ssl.conf
+```
+![image](https://github.com/EMRD95/modoboa-ldap-adds/assets/114953576/398c7242-e203-488f-85c2-ff4bc78fa160)
+
+
+You can also check if the path for the newly generated certificate is in place
+For the web part, you'll find the configuration in /etc/nginx/conf.d/.
+For the smtp part, it will be in /etc/postfix/main.cf
