@@ -57,86 +57,7 @@ Add the MODOBOA_APPS ldapsync
 
 ![image](https://github.com/EMRD95/modoboa-ldap-adds/assets/114953576/224840ca-6f27-4ce2-ab33-3bd1921bbb6b)
 
-### Set up Dovecot [Optional, manual LDAP configuration for other specific use, won't work with other accounts that logged into modoboa webmail, mail folder will be erased the first time the user connect to the modoboa webui]
 
-Keep your current configuration during installation
-
-```bash
-sudo apt-get install dovecot-ldap
-```
-
-Configure Dovecot LDAP:
-
-```bash
-sudo nano /etc/dovecot/dovecot-ldap.conf.ext
-```
-
-Add the following configuration:
-
-```
-hosts           = 192.168.10.xx:389
-ldap_version    = 3
-auth_bind       = yes
-dn              = queryuser
-dnpass          = PASSWORD
-base            = OU=modoba,OU=Units,DC=ad,DC=domain,DC=name
-scope           = subtree
-deref           = never
-user_filter     = (&(userPrincipalName=%u)(objectClass=person)(!(userAccountControl=514)))
-pass_filter     = (&(userPrincipalName=%u)(objectClass=person)(!(userAccountControl=514)))
-pass_attrs      = userPassword=password
-default_pass_scheme = CRYPT
-user_attrs = =home=/srv/vmail/%Ld/%Ln,=mail=maildir:/srv/vmail/%Ld/%Ln
-```
-
-Configure LDAP in Dovecot's auth system:
-
-```bash
-sudo nano /etc/dovecot/conf.d/auth-ldap.conf.ext
-```
-
-Ensure the following is present:
-
-```ini
-passdb {
-  driver = ldap
-  args = /etc/dovecot/dovecot-ldap.conf.ext
-}
- 
-userdb {
-  driver = ldap
-  args = /etc/dovecot/dovecot-ldap.conf.ext
-}
-```
-
-
-Uncomment !include auth-ldap.conf.ext
-```bash
-sudo nano +124 /etc/dovecot/conf.d/10-auth.conf
-```
-
-Set up the UID and GID
-```bash
-sudo nano /etc/dovecot/conf.d/10-master.conf
-```
-![image](https://github.com/EMRD95/modoboa-ldap-adds/assets/114953576/b5f15324-bc0e-47ed-8652-21fa2b200323)
-
-
-Verify LMTP service configuration in Dovecot, ensure the `service lmtp` section is correctly configured.
-
-```bash
-sudo nano /etc/dovecot/conf.d/10-master.conf
-```
-
-```bash
-service lmtp {
- unix_listener /var/spool/postfix/private/dovecot-lmtp {
-   group = postfix
-   mode = 0600
-   user = postfix
-  }
-}
-```
 
 
 ### Modoboa LDAP and Dovecot Synchronization
@@ -229,3 +150,84 @@ sudo nano /etc/dovecot/conf.d/10-ssl.conf
 You can also check if the path for the newly generated certificate is in place
 For the web part, you'll find the configuration in /etc/nginx/conf.d/.
 For the smtp part, it will be in /etc/postfix/main.cf
+
+
+## Set up Dovecot [Optional]
+### Manual LDAP configuration for other specific use, won't work with other accounts that logged into modoboa webmail, mail folder will be erased the first time the user connect to the modoboa webui.
+
+```bash
+sudo apt-get install dovecot-ldap
+```
+
+Configure Dovecot LDAP:
+
+```bash
+sudo nano /etc/dovecot/dovecot-ldap.conf.ext
+```
+
+Add the following configuration:
+
+```
+hosts           = 192.168.10.xx:389
+ldap_version    = 3
+auth_bind       = yes
+dn              = queryuser
+dnpass          = PASSWORD
+base            = OU=modoba,OU=Units,DC=ad,DC=domain,DC=name
+scope           = subtree
+deref           = never
+user_filter     = (&(userPrincipalName=%u)(objectClass=person)(!(userAccountControl=514)))
+pass_filter     = (&(userPrincipalName=%u)(objectClass=person)(!(userAccountControl=514)))
+pass_attrs      = userPassword=password
+default_pass_scheme = CRYPT
+user_attrs = =home=/srv/vmail/%Ld/%Ln,=mail=maildir:/srv/vmail/%Ld/%Ln
+```
+
+Configure LDAP in Dovecot's auth system:
+
+```bash
+sudo nano /etc/dovecot/conf.d/auth-ldap.conf.ext
+```
+
+Ensure the following is present:
+
+```ini
+passdb {
+  driver = ldap
+  args = /etc/dovecot/dovecot-ldap.conf.ext
+}
+ 
+userdb {
+  driver = ldap
+  args = /etc/dovecot/dovecot-ldap.conf.ext
+}
+```
+
+
+Uncomment !include auth-ldap.conf.ext
+```bash
+sudo nano +124 /etc/dovecot/conf.d/10-auth.conf
+```
+
+Set up the UID and GID
+```bash
+sudo nano /etc/dovecot/conf.d/10-master.conf
+```
+![image](https://github.com/EMRD95/modoboa-ldap-adds/assets/114953576/b5f15324-bc0e-47ed-8652-21fa2b200323)
+
+
+Verify LMTP service configuration in Dovecot, ensure the `service lmtp` section is correctly configured.
+
+```bash
+sudo nano /etc/dovecot/conf.d/10-master.conf
+```
+
+```bash
+service lmtp {
+ unix_listener /var/spool/postfix/private/dovecot-lmtp {
+   group = postfix
+   mode = 0600
+   user = postfix
+  }
+}
+```
