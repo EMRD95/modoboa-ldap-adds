@@ -109,6 +109,12 @@ Restart
 sudo systemctl restart dovecot
 ```
 
+or
+
+```bash
+sudo reboot
+```
+
 Make sure to replace placeholders like `your.domain`, `192.168.10.xx`, and `PASSWORD` with your actual data.
 
 ACME domain setup with cloudflare API
