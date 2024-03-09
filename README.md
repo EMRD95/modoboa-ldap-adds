@@ -57,7 +57,7 @@ Add the MODOBOA_APPS ldapsync
 
 ![image](https://github.com/EMRD95/modoboa-ldap-adds/assets/114953576/224840ca-6f27-4ce2-ab33-3bd1921bbb6b)
 
-## Set up Dovecot [If you want to be able to login with third party email services like Thunderbird or Nextcloud]
+## Set up Dovecot [If you want to be able to login with third party email services like Thunderbird or Nextcloud, users will be able to login but not to send or receive messages till they connected the first time to the modoboa webmail to create the modoboa account...]
 
 ```bash
 sudo apt-get install dovecot-ldap
