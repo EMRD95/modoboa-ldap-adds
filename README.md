@@ -1,7 +1,7 @@
 # modoboa-ldap-adds
 ### Tutorial for a local installation of modoboa with LDAP integration, Windows Server 2022 + Ubuntu 22.04 LTS Server.
 
-(home server, for an email server that can send emails to the internet, don't use a domestic IP address) 
+(local test use) 
 
 
 
